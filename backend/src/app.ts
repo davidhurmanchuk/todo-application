@@ -9,13 +9,14 @@ export function createApp() {
 
   const allowedOrigins = (process.env.CORS_ORIGIN || "http://localhost:3000")
     .split(",")
-    .map((o) => o.trim());
+    .map((o) => o.trim().replace(/\/$/, ""));
 
   app.use(
     cors({
       origin: (origin, callback) => {
         if (!origin) return callback(null, true);
-        if (allowedOrigins.includes(origin)) return callback(null, true);
+        const clean = origin.replace(/\/$/, "");
+        if (allowedOrigins.includes(clean)) return callback(null, true);
         callback(new Error(`CORS: origin ${origin} not allowed`));
       },
     }),
