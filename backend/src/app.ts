@@ -7,23 +7,20 @@ import { errorHandler, notFoundHandler } from "./middleware/errorHandler";
 export function createApp() {
   const app = express();
 
-  // const allowedOrigins = (process.env.CORS_ORIGIN || "http://localhost:3000")
-  //   .split(",")
-  //   .map((o) => o.trim().replace(/\/$/, ""));
+  const allowedOrigins = (process.env.CORS_ORIGIN || "http://localhost:3000")
+    .split(",")
+    .map((o) => o.trim().replace(/\/$/, ""));
 
-  // app.use(
-  //   cors({
-  //     origin: (origin, callback) => {
-  //       if (!origin) return callback(null, true);
-  //       const clean = origin.replace(/\/$/, "");
-  //       if (allowedOrigins.includes(clean)) return callback(null, true);
-  //       callback(new Error(`CORS: origin ${origin} not allowed`));
-  //     },
-  //   }),
-  // );
-
-  //test
-  app.use(cors({ origin: true }));
+  app.use(
+    cors({
+      origin: (origin, callback) => {
+        if (!origin) return callback(null, true);
+        const clean = origin.replace(/\/$/, "");
+        if (allowedOrigins.includes(clean)) return callback(null, true);
+        callback(new Error(`CORS: origin ${origin} not allowed`));
+      },
+    }),
+  );
 
   app.use(express.json());
 
