@@ -1,0 +1,41 @@
+version: "3.9"
+
+services:
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: taskify-backend
+    ports:
+      - "4000:4000"
+    volumes:
+      - todo-data:/app/data
+    environment:
+      - NODE_ENV=production
+      - PORT=4000
+      - CORS_ORIGIN=http://localhost:3000
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://localhost:4000/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+      args:
+        NEXT_PUBLIC_API_URL: http://localhost:4000
+    container_name: taskify-frontend
+    ports:
+      - "3000:3000"
+    depends_on:
+      backend:
+        condition: service_healthy
+    environment:
+      - NODE_ENV=production
+    restart: unless-stopped
+
+volumes:
+  todo-data:
